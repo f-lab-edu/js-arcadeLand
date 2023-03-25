@@ -1,9 +1,9 @@
 {
-  "root": true,
-  "env": {
-    "brwoser": true,
-    "node": true,
-    "es2022": true
-  },
-  "extends": ["airbnb", "plugin:prettier/recommended"]
+    "root": true,
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2022": true
+    },
+    "extends": ["airbnb", "plugin:prettier/recommended"]
 }
