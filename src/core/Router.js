@@ -9,11 +9,11 @@ class Router {
         this.interfaceNavigate();
     }
 
-    route() {
+    render() {
         const curPath = window.location.pathname.slice(1);
-        const routTarget = this.paths.find((rout) => rout.path == curPath);
-        if (routTarget) {
-            new routTarget.component(this.$target);
+        const routeTarget = this.paths.find((route) => route.path === curPath);
+        if (routeTarget) {
+            new routeTarget.component(this.$target);
         } else {
             new this.errorPage(this.$target);
         }

@@ -1,10 +1,11 @@
 import CoreComponent from '../core/CoreComponent';
+import '../style/LoadComponent.scss';
 export default class LoadComponent extends CoreComponent {
     setHTML() {
         return `
-        <div class="progress-bar-container">
+        <div class="progressbarContainer">
             <label for="progressbar">Loading...</label>
-            <progress id="progressbar" value="0" max="100"></progress>
+            <progress class="progressbar" value="0" max="100"></progress>
         </div>
             `;
     }

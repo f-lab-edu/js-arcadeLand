@@ -1,7 +1,6 @@
 import LoadComponent from '../components/LoadComponent';
 import CoreComponent from '../core/CoreComponent';
 import World from '../three/World';
-import '../style/MainPage.scss';
 
 export default class MainPage extends CoreComponent {
     setHTML() {
