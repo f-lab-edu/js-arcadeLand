@@ -8,22 +8,22 @@ import floorTexture from '../../resource/floorTexture.jpg';
 export default class World {
     constructor(parent) {
         this.parent = parent;
-        this._Init();
+        this.#Init();
     }
-    _Init() {
-        this._setRenderer();
-        this._loadManage();
-        this._setScene();
-        this._setCamera();
-        this._setLight();
-        this._set3DObject();
-        this._setRayCaster();
-        this._loadCharacter();
-        this._setEvent();
-        this._thirdPersonCamera();
+    #Init() {
+        this.#setRenderer();
+        this.#loadManage();
+        this.#setScene();
+        this.#setCamera();
+        this.#setLight();
+        this.#set3DObject();
+        this.#setRayCaster();
+        this.#loadCharacter();
+        this.#setEvent();
+        this.#thirdPersonCamera();
     }
 
-    _setRenderer() {
+    #setRenderer() {
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
             canvas: this.parent.querySelector('#world'),
@@ -31,21 +31,21 @@ export default class World {
         this.renderer.shadowMap.enabled = true;
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
-    _setScene() {
+    #setScene() {
         this.scene = new THREE.Scene();
         this.textureLoader = new THREE.TextureLoader();
         this.scene.background = this.textureLoader.load(sceneBackground);
     }
-    _setCamera() {
-        let fov = 75;
-        let aspect = window.innerWidth / window.innerHeight;
-        let near = 0.1;
-        let far = 1000;
-        this.camera = new THREE.PerspectiveCamera(75, aspect, near, far);
+    #setCamera() {
+        const fov = 75;
+        const aspect = window.innerWidth / window.innerHeight;
+        const near = 0.1;
+        const far = 1000;
+        this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this.camera.position.set(0, 10, 10);
         this.scene.add(this.camera);
     }
-    _setLight() {
+    #setLight() {
         this.ambientLight = new THREE.AmbientLight(0x333333);
         this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
         this.directionalLight.position.set(-100, 100, 0);
@@ -53,7 +53,7 @@ export default class World {
         this.scene.add(this.ambientLight);
         this.scene.add(this.directionalLight);
     }
-    _loadManage() {
+    #loadManage() {
         this.loadManager = new THREE.LoadingManager();
         const progressbar = this.parent.querySelector('#progressbar');
         const progressbarContainer = this.parent.querySelector('.progress-bar-container');
@@ -62,10 +62,10 @@ export default class World {
         };
         this.loadManager.onLoad = () => {
             progressbarContainer.style.display = 'none';
-            this._animate();
+            this.#animate();
         };
     }
-    _set3DObject() {
+    #set3DObject() {
         //바닥
         const planeGeometry = new THREE.PlaneGeometry(100, 100);
         const texture = this.textureLoader.load(floorTexture);
@@ -119,7 +119,7 @@ export default class World {
             }
         });
     }
-    _loadCharacter() {
+    #loadCharacter() {
         this.animations = {};
         this.speed = 0;
         this.move = { forward: false, backward: false, left: false, right: false };
@@ -143,11 +143,11 @@ export default class World {
             fbxLoader.load('./Walking.fbx', (ani) => animationLoad('walk', ani));
             fbxLoader.load('./Idle.fbx', (ani) => {
                 animationLoad('idle', ani);
-                this.animations['idle'].action.play();
+                this.animations.idle.action.play();
             });
         });
     }
-    _thirdPersonCamera() {
+    #thirdPersonCamera() {
         const calculateNextPosition = () => {
             const cameraDefaultPosition = new THREE.Vector3(0, 15, -20);
             cameraDefaultPosition.applyQuaternion(this.character.quaternion);
@@ -167,11 +167,11 @@ export default class World {
             this.camera.lookAt(cameraNextLookat);
         };
     }
-    _setRayCaster() {
+    #setRayCaster() {
         this.mouseLocation = new THREE.Vector2();
         this.rayCaster = new THREE.Raycaster();
     }
-    _animate() {
+    #animate() {
         this.mixer.update(this.clock.getDelta());
         this.speed = 0;
         this.cameraUpdate();
@@ -185,10 +185,10 @@ export default class World {
         }
         this.character.translateZ(this.speed);
         this.renderer.render(this.scene, this.camera);
-        requestAnimationFrame(this._animate.bind(this));
+        requestAnimationFrame(() => this.#animate());
     }
 
-    _setEvent() {
+    #setEvent() {
         const resizeEventCallback = (event) => {
             const { innerWidth, innerHeight } = event.target;
             this.camera.aspect = innerWidth / innerHeight;
@@ -221,45 +221,37 @@ export default class World {
                 }
             }
         };
-        const keyup = (e) => {
-            console.log('keyup');
-            switch (e.keyCode) {
-                case 37:
-                    this.move.left = false;
+
+        const keyHandler = (e) => {
+            const boolean = e.type != 'keyup';
+            switch (e.key) {
+                case 'ArrowLeft':
+                    this.move.left = boolean;
                     break;
-                case 38:
-                    this.move.forward = false;
+                case 'ArrowUp':
+                    this.move.forward = boolean;
+                    if (boolean) {
+                        this.animations.walk.action.play();
+                        break;
+                    }
                     this.mixer.stopAllAction();
-                    this.animations['idle'].action.play();
+                    this.animations.idle.action.play();
                     break;
-                case 39:
-                    this.move.right = false;
+                case 'ArrowRight':
+                    this.move.right = boolean;
                     break;
-                case 40:
-                    this.move.backward = false;
+                case 'ArrowDown':
+                    this.move.backward = boolean;
+                    if (boolean) {
+                        this.animations.walk.action.play();
+                        break;
+                    }
                     this.mixer.stopAllAction();
-                    this.animations['idle'].action.play();
+                    this.animations.idle.action.play();
                     break;
             }
         };
-        const keydown = (e) => {
-            switch (e.keyCode) {
-                case 37:
-                    this.move.left = true;
-                    break;
-                case 38:
-                    this.move.forward = true;
-                    this.animations['walk'].action.play();
-                    break;
-                case 39:
-                    this.move.right = true;
-                    break;
-                case 40:
-                    this.move.backward = true;
-                    this.animations['walk'].action.play();
-                    break;
-            }
-        };
+
         this.events = [];
         const addEvent = (type, target, callback) => {
             this.events.push({ type, target, callback });
@@ -267,8 +259,8 @@ export default class World {
         };
         addEvent('resize', window, resizeEventCallback);
         addEvent('click', document, clickEventCallback);
-        addEvent('keydown', document, keydown);
-        addEvent('keyup', document, keyup);
+        addEvent('keydown', document, keyHandler);
+        addEvent('keyup', document, keyHandler);
     }
 
     clearEvent() {
