@@ -1,16 +1,14 @@
 import CoreComponent from '../core/CoreComponent';
-import bezel from '../../resource/bezel.png';
-import '../style/CrtEffect.scss';
-
+import RetroContainerComponent from '../components/RetroContainerComponent';
 export default class SnakePage extends CoreComponent {
     setHTML() {
         return `
-        <div id="retroContainer">
-            <img src=${bezel} id="bezelImg"/>
-            <canvas id="retroCanvas" width="1080" height="1080"></canvas>
-            <div id="crt"></div>
-        </div>
+        <div class="retroContainer"></div>
         `;
+    }
+    appendChild() {
+        const retroContainer = document.querySelector('.retroContainer');
+        new RetroContainerComponent(retroContainer);
     }
     setup() {
         //1080px 기준
@@ -28,19 +26,40 @@ export default class SnakePage extends CoreComponent {
         let appleX = 4;
         let appleY = 4;
         //좌표 이동
-        let xv = 0;
-        let yv = 0;
+        let moveX = 0;
+        let moveY = 0;
 
         const gridSize = 20;
-        let gridCountWidth = canvas.width / gridSize;
-        let girdCountHeight = canvas.width / gridSize;
+        const gridCountWidth = canvas.width / gridSize;
+        const girdCountHeight = canvas.width / gridSize;
+
+        function keyDownHandler(e) {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    moveX = -1;
+                    moveY = 0;
+                    break;
+                case 'ArrowUp':
+                    moveX = 0;
+                    moveY = -1;
+                    break;
+                case 'ArrowRight':
+                    moveX = 1;
+                    moveY = 0;
+                    break;
+                case 'ArrowDown':
+                    moveX = 0;
+                    moveY = 1;
+                    break;
+            }
+        }
 
         document.addEventListener('keydown', keyDownHandler);
 
         function start() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            snakeX += xv;
-            snakeY += yv;
+            snakeX += moveX;
+            snakeY += moveY;
             if (snakeX < 0) {
                 snakeX = gridCountWidth - 1;
             }
@@ -58,7 +77,7 @@ export default class SnakePage extends CoreComponent {
 
             for (let i = 0; i < snakeLocation.length; i++) {
                 ctx.fillRect(snakeLocation[i].x * gridSize, snakeLocation[i].y * gridSize, gridSize - 2, gridSize - 2);
-                if (snakeLocation[i].x == snakeX && snakeLocation[i].y == snakeY) {
+                if (snakeLocation[i].x === snakeX && snakeLocation[i].y === snakeY) {
                     tail = i + 1;
                 }
             }
@@ -66,34 +85,13 @@ export default class SnakePage extends CoreComponent {
             while (snakeLocation.length > tail) {
                 snakeLocation.shift();
             }
-            if (appleX == snakeX && appleY == snakeY) {
+            if (appleX === snakeX && appleY === snakeY) {
                 tail++;
                 appleX = Math.floor(Math.random() * gridCountWidth);
                 appleY = Math.floor(Math.random() * girdCountHeight);
             }
             ctx.fillStyle = 'red';
             ctx.fillRect(appleX * gridSize, appleY * gridSize, gridSize - 2, gridSize - 2);
-        }
-
-        function keyDownHandler(e) {
-            switch (e.key) {
-                case 'ArrowLeft':
-                    xv = -1;
-                    yv = 0;
-                    break;
-                case 'ArrowUp':
-                    xv = 0;
-                    yv = -1;
-                    break;
-                case 'ArrowRight':
-                    xv = 1;
-                    yv = 0;
-                    break;
-                case 'ArrowDown':
-                    xv = 0;
-                    yv = 1;
-                    break;
-            }
         }
 
         setInterval(start, 60);
