@@ -265,7 +265,6 @@ export default class World {
 
     clearEvent() {
         this.events.forEach(({ type, target, callback }) => {
-            console.log(type, target, callback);
             target.removeEventListener(type, callback);
         });
     }
