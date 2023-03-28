@@ -1,1 +1,3 @@
-import '../index.css';
+import router from './core/Router';
+
+router.route();
