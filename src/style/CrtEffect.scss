@@ -1,58 +1,58 @@
-.retroContainer {
+#retroContainer {
     position: relative;
     box-shadow: 0 0 200px gray;
+}
 
-    #bezelImg {
+#crt {
+    &::after {
+        content: '';
+        background-color: rgba(179, 255, 209, 0.42);
+        opacity: 0.05;
         position: absolute;
-        margin: auto;
+        width: 1180px;
+        height: 50px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        animation: effect 4s linear 1s infinite;
+    }
+    @keyframes effect {
+        from {
+            top: 0px;
+        }
+        to {
+            top: 1130px;
+        }
+    }
+    &::before {
+        content: '';
+        display: block;
+        position: absolute;
         width: 1180px;
         height: 1180px;
-        z-index: 2;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(rgb(48, 29, 29), gray);
+        opacity: 0.5;
+        z-index: 1;
+        background-size: 100% 2px;
+        pointer-events: none;
     }
+}
 
-    #retroCanvas {
-        background-color: rgb(47, 47, 47);
-        padding: 50px;
-    }
+#retroCanvas {
+    background-color: rgb(47, 47, 47);
+    padding: 50px;
+}
 
-    .crt {
-        &::after {
-            content: '';
-            background-color: rgba(179, 255, 209, 0.42);
-            opacity: 0.05;
-            position: absolute;
-            width: 1180px;
-            height: 50px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: effect 4s linear 1s infinite;
-        }
-        @keyframes effect {
-            from {
-                top: 0px;
-            }
-            to {
-                top: 1130px;
-            }
-        }
-        &::before {
-            content: '';
-            display: block;
-            position: absolute;
-            width: 1180px;
-            height: 1180px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(rgb(48, 29, 29), gray);
-            opacity: 0.5;
-            z-index: 1;
-            background-size: 100% 2px;
-            pointer-events: none;
-        }
-    }
+#bezelImg {
+    position: absolute;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1180px;
+    height: 1180px;
+    z-index: 2;
 }
