@@ -1,5 +1,6 @@
 import CoreComponent from '../core/CoreComponent';
 import '../style/LoadComponent.scss';
+
 export default class LoadComponent extends CoreComponent {
     setHTML() {
         return `
