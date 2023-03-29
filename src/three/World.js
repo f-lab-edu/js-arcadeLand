@@ -86,7 +86,7 @@ export default class World {
             [40, 0, 0],
         ];
         this.gltfLoader = new GLTFLoader(this.loadManager);
-        this.gltfLoader.load('./scene.gltf', (target) => {
+        this.gltfLoader.load('/js-arcadeLand/scene.gltf', (target) => {
             const gameMachine = target.scene;
             const machineCounter = 4;
             gameMachine.scale.setScalar(0.08);
@@ -107,7 +107,7 @@ export default class World {
                                 e.name = 'Ball';
                                 break;
                             case 3:
-                                e.name = 'Galagu';
+                                e.name = 'Galaga';
                                 break;
                         }
                     }
@@ -125,7 +125,7 @@ export default class World {
         this.move = { forward: false, backward: false, left: false, right: false };
         this.clock = new THREE.Clock();
         const fbxLoader = new FBXLoader(this.loadManager);
-        fbxLoader.load('./Ch09_nonPBR.fbx', (target) => {
+        fbxLoader.load('/js-arcadeLand/Ch09_nonPBR.fbx', (target) => {
             this.character = target;
             this.character.scale.setScalar(0.05);
             this.character.traverse((e) => {
@@ -140,8 +140,8 @@ export default class World {
                 this.animations[name] = { clip, action };
             };
 
-            fbxLoader.load('./Walking.fbx', (ani) => animationLoad('walk', ani));
-            fbxLoader.load('./Idle.fbx', (ani) => {
+            fbxLoader.load('/js-arcadeLand/Walking.fbx', (ani) => animationLoad('walk', ani));
+            fbxLoader.load('/js-arcadeLand/Idle.fbx', (ani) => {
                 animationLoad('idle', ani);
                 this.animations.idle.action.play();
             });
@@ -200,7 +200,7 @@ export default class World {
             this.mouseLocation.y = -(e.clientY / window.innerHeight) * 2 + 1;
             this.rayCaster.setFromCamera(this.mouseLocation, this.camera);
             const intersects = this.rayCaster.intersectObjects(this.scene.children);
-            const routeList = ['Snake', 'Tetris', 'Ball', 'Galagu'];
+            const routeList = ['Snake', 'Tetris', 'Ball', 'Galaga'];
             for (let i = 0; i < intersects.length; i++) {
                 if (routeList.includes(intersects[i].object.name)) {
                     router.push(intersects[i].object.name);

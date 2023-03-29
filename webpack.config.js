@@ -6,17 +6,18 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const devMode = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     devServer: {
         port: 9000,
         historyApiFallback: true,
     },
-    devtool: 'eval-cheap-source-map',
+    devtool: devMode ? 'eval-cheap-source-map' : false,
     entry: './src/index.js',
     output: {
         filename: '[name].[chunkhash].js',
         chunkFilename: '[name].chunk.js',
         path: path.resolve(__dirname, 'dist'),
+        publicPath: '/js-arcadeLand/',
     },
     module: {
         rules: [
@@ -42,18 +43,24 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: 'index.html',
+            publicPath: '/js-arcadeLand/',
         }),
         new MiniCssExtractPlugin({
             filename: '[name].[contenthash].css',
             chunkFilename: '[name].[contenthash].chunk.css',
         }),
         new CopyPlugin({
-            patterns: [{ from: 'resource/arcade_machine' }, { from: 'resource/avatar' }],
+            patterns: [{ from: './resource/arcade_machine' }, { from: './resource/avatar' }],
         }),
     ],
     optimization: {
         splitChunks: {
             chunks: 'all',
         },
+    },
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000,
     },
 };
