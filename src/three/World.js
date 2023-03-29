@@ -55,8 +55,8 @@ export default class World {
     }
     #loadManage() {
         this.loadManager = new THREE.LoadingManager();
-        const progressbar = this.parent.querySelector('#progressbar');
-        const progressbarContainer = this.parent.querySelector('.progress-bar-container');
+        const progressbar = this.parent.querySelector('.progressbar');
+        const progressbarContainer = this.parent.querySelector('.progressbarContainer');
         this.loadManager.onProgress = function (url, loaded, total) {
             progressbar.value = (loaded / total) * 100;
         };
@@ -98,16 +98,16 @@ export default class World {
                         e.castShadow = true;
                         switch (machineIndex) {
                             case 0:
-                                e.name = 'snakeGame';
+                                e.name = 'Snake';
                                 break;
                             case 1:
-                                e.name = 'tetris';
+                                e.name = 'Tetris';
                                 break;
                             case 2:
-                                e.name = 'ballGame';
+                                e.name = 'Ball';
                                 break;
                             case 3:
-                                e.name = 'gallug';
+                                e.name = 'Galagu';
                                 break;
                         }
                     }
@@ -200,24 +200,12 @@ export default class World {
             this.mouseLocation.y = -(e.clientY / window.innerHeight) * 2 + 1;
             this.rayCaster.setFromCamera(this.mouseLocation, this.camera);
             const intersects = this.rayCaster.intersectObjects(this.scene.children);
+            const routeList = ['Snake', 'Tetris', 'Ball', 'Galagu'];
             for (let i = 0; i < intersects.length; i++) {
-                switch (intersects[i].object.name) {
-                    case 'snakeGame':
-                        router.push('Snake');
-                        this.clearEvent();
-                        return;
-                    case 'tetris':
-                        router.push('Tetris');
-                        this.clearEvent();
-                        return;
-                    case 'ballGame':
-                        router.push('Ball');
-                        this.clearEvent();
-                        return;
-                    case 'gallug':
-                        router.push('Galagu');
-                        this.clearEvent();
-                        return;
+                if (routeList.includes(intersects[i].object.name)) {
+                    router.push(intersects[i].object.name);
+                    this.clearEvent();
+                    return;
                 }
             }
         };

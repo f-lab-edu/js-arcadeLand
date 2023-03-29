@@ -4,7 +4,7 @@ import ErrorPage from '../pages/ErrorPage';
 class Router {
     constructor() {
         this.errorPage = ErrorPage;
-        this.$target = document.querySelector('.App');
+        this.$target = document.querySelector('#app');
         this.paths = paths;
         this.interfaceNavigate();
     }
@@ -21,12 +21,12 @@ class Router {
 
     push(path) {
         window.history.pushState(null, null, path);
-        this.route();
+        this.render();
     }
 
     interfaceNavigate() {
         window.addEventListener('popstate', () => {
-            this.route();
+            this.render();
         });
     }
 }
