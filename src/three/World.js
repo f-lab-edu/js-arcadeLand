@@ -2,9 +2,13 @@ import router from '../core/Router';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import sceneBackground from '../../resource/space.jpg';
 import floorTexture from '../../resource/floorTexture.jpg';
-
+import avatar from '../../resource/avatar/Ch09_nonPBR.fbx';
+import walkAnimation from '../../resource/avatar/Walking.fbx';
+import idleAnimation from '../../resource/avatar/Idle.fbx';
+import arcadeMachine from '../../resource/arcade_machine/arcadeMachine.glb';
 export default class World {
     constructor(parent) {
         this.parent = parent;
@@ -86,7 +90,10 @@ export default class World {
             [40, 0, 0],
         ];
         this.gltfLoader = new GLTFLoader(this.loadManager);
-        this.gltfLoader.load('/js-arcadeLand/scene.gltf', (target) => {
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/libs/draco/');
+        this.gltfLoader.setDRACOLoader(dracoLoader);
+        this.gltfLoader.load(arcadeMachine, (target) => {
             const gameMachine = target.scene;
             const machineCounter = 4;
             gameMachine.scale.setScalar(0.08);
@@ -125,7 +132,7 @@ export default class World {
         this.move = { forward: false, backward: false, left: false, right: false };
         this.clock = new THREE.Clock();
         const fbxLoader = new FBXLoader(this.loadManager);
-        fbxLoader.load('/js-arcadeLand/Ch09_nonPBR.fbx', (target) => {
+        fbxLoader.load(avatar, (target) => {
             this.character = target;
             this.character.scale.setScalar(0.05);
             this.character.traverse((e) => {
@@ -139,9 +146,8 @@ export default class World {
                 const action = this.mixer.clipAction(clip);
                 this.animations[name] = { clip, action };
             };
-
-            fbxLoader.load('/js-arcadeLand/Walking.fbx', (ani) => animationLoad('walk', ani));
-            fbxLoader.load('/js-arcadeLand/Idle.fbx', (ani) => {
+            fbxLoader.load(walkAnimation, (ani) => animationLoad('walk', ani));
+            fbxLoader.load(idleAnimation, (ani) => {
                 animationLoad('idle', ani);
                 this.animations.idle.action.play();
             });
