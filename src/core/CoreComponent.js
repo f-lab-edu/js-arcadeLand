@@ -4,8 +4,8 @@ export default class CoreComponent {
         this.props = props;
         this.render();
         this.appendChild();
-        this.setup();
         this.setEvent();
+        this.setup();
     }
 
     setup() {}
@@ -25,9 +25,8 @@ export default class CoreComponent {
 
     setEvent() {}
 
-    addEvent(type, selector, callback) {
+    addEvent(type, callback) {
         this.$target.addEventListener(type, (event) => {
-            if (!event.target.closest(selector)) return false;
             callback(event);
         });
     }

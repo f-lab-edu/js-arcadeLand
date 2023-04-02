@@ -46,8 +46,9 @@ export default class Tetris {
     #levelUp() {
         if (this.#lines != 0 && this.#lines % 10 === 0) {
             this.#level += 1;
+            this.#canvas.dispatchEvent(new CustomEvent('levelUpPlay', { bubbles: true }));
+            this.#setBackgroundImage();
         }
-        this.#setBackgroundImage();
     }
 
     #clearFilledLine() {
@@ -62,6 +63,7 @@ export default class Tetris {
             if (flag) {
                 this.#lines += 1;
                 this.#score += 100;
+                this.#levelUp();
                 for (let resetY = y; resetY > 0; resetY--) {
                     this.board[resetY] = this.board[resetY - 1];
                 }
@@ -84,6 +86,7 @@ export default class Tetris {
         }
         this.#curTetromino = this.#nextTetromino;
         this.#nextTetromino = this.#tetrominoQueue.shift();
+        this.#canvas.dispatchEvent(new CustomEvent('fixPlay', { bubbles: true }));
         this.#clearFilledLine();
     }
 
@@ -99,9 +102,11 @@ export default class Tetris {
         this.#renderAnimationId = requestAnimationFrame(() => this.#canvasRender());
         this.#gravityIntervalId = setInterval(() => this.#gravity(), this.#gravityIntervalTime);
         this.#setEvent();
+        this.#canvas.dispatchEvent(new CustomEvent('startPlay', { bubbles: true }));
     }
 
     #gameEnd() {
+        this.#canvas.dispatchEvent(new CustomEvent('gameOverPlay', { bubbles: true }));
         cancelAnimationFrame(this.#renderAnimationId);
         clearInterval(this.#gravityIntervalId);
     }
