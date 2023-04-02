@@ -47,6 +47,7 @@ export default class Tetris {
         if (this.#lines != 0 && this.#lines % 10 === 0) {
             this.#level += 1;
         }
+        this.#setBackgroundImage();
     }
 
     #clearFilledLine() {
@@ -105,9 +106,21 @@ export default class Tetris {
         clearInterval(this.#gravityIntervalId);
     }
 
-    #canvasRender(timeStamp) {
-        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+    #drawNext() {
+        this.#ctx.strokeStyle = 'white';
+        this.#ctx.strokeText('next', 100, 200);
 
+        this.#ctx.fillStyle = this.#nextTetromino.color;
+        for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 4; x++) {
+                if (this.#nextTetromino.block[y][x]) {
+                    this.#ctx.fillRect(100 + this.#gridSize * x, 250 + y * this.#gridSize, this.#gridSize - 2, this.#gridSize - 2);
+                }
+            }
+        }
+    }
+
+    #drawBaord() {
         this.#ctx.strokeStyle = 'white';
         for (let y = 0; y < this.#column; y++) {
             for (let x = 0; x < this.#row; x++) {
@@ -118,7 +131,9 @@ export default class Tetris {
                 }
             }
         }
+    }
 
+    #drawTetromino() {
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 4; x++) {
                 if (this.#curTetromino.block[y][x]) {
@@ -132,6 +147,13 @@ export default class Tetris {
                 }
             }
         }
+    }
+
+    #canvasRender(timeStamp) {
+        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+        this.#drawNext();
+        this.#drawBaord();
+        this.#drawTetromino();
         this.#renderAnimationId = requestAnimationFrame(() => this.#canvasRender());
     }
 
@@ -142,6 +164,7 @@ export default class Tetris {
             this.#fixBoard();
         }
     }
+
     isValid(moveX, moveY, checkBlock) {
         const nextX = moveX + checkBlock.curX;
         const nextY = moveY + checkBlock.curY;
