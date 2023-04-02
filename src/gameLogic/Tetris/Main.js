@@ -1,3 +1,5 @@
+import TetrominoQueue from './TetrominoQueue';
+
 export default class Tetris {
     #ctx;
     #gridSize;
@@ -16,19 +18,6 @@ export default class Tetris {
         this.#row = 10;
         this.#column = 20;
         this.#gravityIntervalTime = 400;
-        this.#Init();
-    }
-
-    #Init() {
-        this.board = Array.from(Array(this.#column), () =>
-            new Array(this.#row).fill(0).map((e) => {
-                return { value: 0, color: 'black' };
-            })
-        );
-        this.#tetrominoQueue = new TetrominoQueue();
-        this.#curTetromino = this.#tetrominoQueue.shift();
-        this.#nextTetromino = this.#tetrominoQueue.shift();
-        this.#setEvent();
         this.#gameStart();
     }
 
@@ -67,8 +56,17 @@ export default class Tetris {
     }
 
     #gameStart() {
+        this.board = Array.from(Array(this.#column), () =>
+            new Array(this.#row).fill(0).map((e) => {
+                return { value: 0, color: 'black' };
+            })
+        );
+        this.#tetrominoQueue = new TetrominoQueue();
+        this.#curTetromino = this.#tetrominoQueue.shift();
+        this.#nextTetromino = this.#tetrominoQueue.shift();
         this.#renderAnimationId = requestAnimationFrame(() => this.#canvasRender());
         this.#gravityIntervalId = setInterval(() => this.#gravity(), this.#gravityIntervalTime);
+        this.#setEvent();
     }
 
     #gameEnd() {
@@ -156,77 +154,5 @@ export default class Tetris {
             }
         };
         document.addEventListener('keydown', keydownHandler);
-    }
-}
-
-class Tetromino {
-    constructor(targetBlock, color) {
-        this.color = color;
-        this.curX = 5;
-        this.curY = 0;
-        this.#createNewTetromino(targetBlock);
-    }
-
-    #createNewTetromino(targetBlock) {
-        this.block = Array.from(Array(4), (e) => new Array(4).fill(0));
-        for (let y = 0; y < 4; y++) {
-            for (let x = 0; x < 4; x++) {
-                if (targetBlock[4 * y + x] === 1) {
-                    this.block[y][x] = 1;
-                }
-            }
-        }
-    }
-
-    rotate(isValid) {
-        const rotatedCurTetromino = {
-            block: Array.from(Array(4), (e) => new Array(4)),
-            curX: this.curX,
-            curY: this.curY,
-        };
-        for (let y = 0; y < 4; y++) {
-            for (let x = 0; x < 4; x++) {
-                rotatedCurTetromino.block[y][x] = this.block[3 - x][y];
-            }
-        }
-        if (isValid(0, 0, rotatedCurTetromino)) {
-            this.block = rotatedCurTetromino.block;
-        }
-    }
-
-    rowMoving(direction, isValid) {
-        if (direction === 'Left') {
-            if (isValid(-1, 0, this)) this.curX -= 1;
-        } else {
-            if (isValid(1, 0, this)) this.curX += 1;
-        }
-    }
-}
-
-class TetrominoQueue {
-    #blockCaseSet;
-    #colors;
-    constructor() {
-        this.queue = [];
-        this.#blockCaseSet = [
-            [1, 1, 1, 1], //I
-            [1, 1, 1, 0, 1], //L
-            [0, 1, 0, 0, 1, 1, 1], //T
-            [1, 1, 0, 0, 1, 1], //O
-            [1, 0, 0, 0, 1, 1, 1], //J
-            [0, 1, 1, 0, 1, 1], //S
-            [1, 1, 0, 0, 0, 1, 1], //Z
-        ];
-        this.#colors = ['aqua', 'blue', 'yellow', 'oragne', 'lime', 'purple', 'red'];
-        this.#appendTetrominoQueue();
-    }
-    #appendTetrominoQueue() {
-        for (let i = 7; i > 0; i--) {
-            this.queue.push(new Tetromino(...this.#blockCaseSet.splice(Math.floor(Math.random() * i), 1), this.#colors.shift()));
-        }
-    }
-
-    shift() {
-        return this.queue.shift();
     }
 }

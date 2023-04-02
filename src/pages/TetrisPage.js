@@ -1,6 +1,6 @@
 import CoreComponent from '../core/CoreComponent';
 import RetroContainerComponent from '../components/RetroContainerComponent';
-import Tetris from '../gameLogic/Tetris';
+import Tetris from '../gameLogic/Tetris/Main';
 export default class TetrisPage extends CoreComponent {
     setHTML() {
         return `
