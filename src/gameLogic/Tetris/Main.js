@@ -31,7 +31,7 @@ export default class Tetris {
         this.centerX = this.#canvas.width / 2 - (this.#row / 2) * this.#gridSize;
         this.centerY = this.#canvas.height / 2 - (this.#column / 2) * this.#gridSize;
         this.backgroundImages = [background1, background2, background3, background4, background5];
-        this.#gravityIntervalTime = 100;
+        this.#gravityIntervalTime = 400;
         this.#level = 1;
         this.#lines = 0;
         this.#score = 0;
@@ -44,8 +44,9 @@ export default class Tetris {
     }
 
     #levelUp() {
-        if (this.#lines != 0 && this.#lines % 10 === 0) {
+        if (this.#lines != 0 && this.#lines % 5 === 0) {
             this.#level += 1;
+            this.#gravityIntervalTime *= 0.9;
             this.#canvas.dispatchEvent(new CustomEvent('levelUpPlay', { bubbles: true }));
             this.#setBackgroundImage();
         }
@@ -62,7 +63,7 @@ export default class Tetris {
             }
             if (flag) {
                 this.#lines += 1;
-                this.#score += 100;
+                this.#score += 100 * this.#level;
                 this.#levelUp();
                 for (let resetY = y; resetY > 0; resetY--) {
                     this.board[resetY] = this.board[resetY - 1];
@@ -87,6 +88,7 @@ export default class Tetris {
         this.#curTetromino = this.#nextTetromino;
         this.#nextTetromino = this.#tetrominoQueue.shift();
         this.#canvas.dispatchEvent(new CustomEvent('fixPlay', { bubbles: true }));
+        this.#score += 10 * this.#level;
         this.#clearFilledLine();
     }
 
@@ -111,10 +113,17 @@ export default class Tetris {
         clearInterval(this.#gravityIntervalId);
     }
 
+    #fillTextAsGradientColor(x, y, text, color) {
+        this.#ctx.strokeStyle = 'purple';
+        this.#ctx.strokeText(text, x, y);
+        const gradient = this.#ctx.createLinearGradient(x, y, this.#ctx.measureText(text).width, y + 64);
+        gradient.addColorStop(0, 'white');
+        gradient.addColorStop(1, color);
+        this.#ctx.fillStyle = gradient;
+        this.#ctx.fillText(text, x, y);
+    }
     #drawNext() {
-        this.#ctx.strokeStyle = 'white';
-        this.#ctx.strokeText('next', 100, 200);
-
+        this.#fillTextAsGradientColor(100, 200, 'NEXT', 'red');
         this.#ctx.fillStyle = this.#nextTetromino.color;
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 4; x++) {
@@ -124,7 +133,14 @@ export default class Tetris {
             }
         }
     }
-
+    #drawInformation() {
+        this.#fillTextAsGradientColor(100, 400, 'LEVEL', 'lime');
+        this.#fillTextAsGradientColor(100, 500, `${this.#level}`, 'lime');
+        this.#fillTextAsGradientColor(100, 600, 'SCORE', 'aqua');
+        this.#fillTextAsGradientColor(100, 700, `${this.#score}`, 'aqua');
+        this.#fillTextAsGradientColor(100, 800, 'LINES', 'orange');
+        this.#fillTextAsGradientColor(100, 900, `${this.#lines}`, 'orange');
+    }
     #drawBaord() {
         this.#ctx.strokeStyle = 'white';
         for (let y = 0; y < this.#column; y++) {
@@ -157,6 +173,7 @@ export default class Tetris {
     #canvasRender(timeStamp) {
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
         this.#drawNext();
+        this.#drawInformation();
         this.#drawBaord();
         this.#drawTetromino();
         this.#renderAnimationId = requestAnimationFrame(() => this.#canvasRender());
