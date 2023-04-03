@@ -20,6 +20,7 @@ export default class Tetris {
     #level;
     #lines;
     #score;
+    #board;
 
     constructor($canvas) {
         this.#canvas = $canvas;
@@ -28,9 +29,9 @@ export default class Tetris {
         this.#gridSize = 40;
         this.#row = 10;
         this.#column = 20;
-        this.centerX = this.#canvas.width / 2 - (this.#row / 2) * this.#gridSize;
-        this.centerY = this.#canvas.height / 2 - (this.#column / 2) * this.#gridSize;
-        this.backgroundImages = [background1, background2, background3, background4, background5];
+        this.#centerX = this.#canvas.width / 2 - (this.#row / 2) * this.#gridSize;
+        this.#centerY = this.#canvas.height / 2 - (this.#column / 2) * this.#gridSize;
+        this.#backgroundImages = [background1, background2, background3, background4, background5];
         this.#gravityIntervalTime = 400;
         this.#level = 1;
         this.#lines = 0;
@@ -40,7 +41,7 @@ export default class Tetris {
     }
 
     #setBackgroundImage() {
-        this.#canvas.style.background = `center / 99% 99% no-repeat  url(${this.backgroundImages[this.#level - 1]}) `;
+        this.#canvas.style.background = `center / 99% 99% no-repeat  url(${this.#backgroundImages[this.#level - 1]}) `;
     }
 
     #levelUp() {
@@ -56,7 +57,7 @@ export default class Tetris {
         for (let y = this.#column - 1; y >= 0; y--) {
             let flag = true;
             for (let x = 0; x < this.#row; x++) {
-                if (this.board[y][x].value != 1) {
+                if (this.#board[y][x].value != 1) {
                     flag = false;
                     break;
                 }
@@ -66,8 +67,9 @@ export default class Tetris {
                 this.#score += 100 * this.#level;
                 this.#levelUp();
                 for (let resetY = y; resetY > 0; resetY--) {
-                    this.board[resetY] = this.board[resetY - 1];
+                    this.#board[resetY] = this.#board[resetY - 1].map((e) => Object.assign({}, e));
                 }
+
                 ++y;
             }
         }
@@ -77,8 +79,8 @@ export default class Tetris {
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 4; x++) {
                 if (this.#curTetromino.block[y][x]) {
-                    this.board[this.#curTetromino.curY + y][this.#curTetromino.curX + x].value = 1;
-                    this.board[this.#curTetromino.curY + y][this.#curTetromino.curX + x].color = this.#curTetromino.color;
+                    this.#board[this.#curTetromino.curY + y][this.#curTetromino.curX + x].value = 1;
+                    this.#board[this.#curTetromino.curY + y][this.#curTetromino.curX + x].color = this.#curTetromino.color;
                 }
             }
         }
@@ -93,7 +95,7 @@ export default class Tetris {
     }
 
     #gameStart() {
-        this.board = Array.from(Array(this.#column), () =>
+        this.#board = Array.from(Array(this.#column), () =>
             new Array(this.#row).fill(0).map((e) => {
                 return { value: 0, color: 'black' };
             })
@@ -146,8 +148,8 @@ export default class Tetris {
         for (let y = 0; y < this.#column; y++) {
             for (let x = 0; x < this.#row; x++) {
                 this.#ctx.strokeRect(this.centerX + x * this.#gridSize, this.centerY + y * this.#gridSize, this.#gridSize - 2, this.#gridSize - 2);
-                if (this.board[y][x].value) {
-                    this.#ctx.fillStyle = this.board[y][x].color;
+                if (this.#board[y][x].value) {
+                    this.#ctx.fillStyle = this.#board[y][x].color;
                     this.#ctx.fillRect(this.centerX + x * this.#gridSize, this.centerY + y * this.#gridSize, this.#gridSize - 2, this.#gridSize - 2);
                 }
             }
@@ -194,12 +196,12 @@ export default class Tetris {
             for (let x = 0; x < 4; x++) {
                 if (checkBlock.block[y][x]) {
                     if (
-                        this.board[nextY + y] === undefined ||
-                        this.board[nextY + y][nextX + x] === undefined ||
+                        this.#board[nextY + y] === undefined ||
+                        this.#board[nextY + y][nextX + x] === undefined ||
                         nextY + y >= this.#column ||
                         nextX + x < 0 ||
                         nextX + x >= this.#row ||
-                        this.board[nextY + y][nextX + x].value
+                        this.#board[nextY + y][nextX + x].value
                     ) {
                         if (nextY === 1) {
                             return this.#gameEnd();
