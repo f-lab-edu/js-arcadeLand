@@ -4,7 +4,6 @@ import background2 from '../../../resource/TetrisBackground2.jpg';
 import background3 from '../../../resource/TetrisBackground3.jpg';
 import background4 from '../../../resource/TetrisBackground4.jpg';
 import background5 from '../../../resource/TetrisBackground5.jpg';
-
 export default class Tetris {
     #canvas;
     #ctx;
@@ -28,7 +27,6 @@ export default class Tetris {
     constructor($canvas) {
         this.#canvas = $canvas;
         this.#ctx = $canvas.getContext('2d');
-        this.#ctx.font = 'bold 80px VT323';
         this.#gridSize = 40;
         this.#row = 10;
         this.#column = 20;
@@ -39,8 +37,65 @@ export default class Tetris {
         this.#level = 1;
         this.#lines = 0;
         this.#score = 0;
-        this.#setBackgroundImage();
-        this.#gameStart();
+        this.#beforeStart();
+    }
+
+    #drawBlinkEffectText(text, fontsize, color, x, y) {
+        this.#ctx.font = `bold ${fontsize}px VT323`;
+        let blinkFlag = false;
+        const drawBlinkIntervalId = setInterval(() => {
+            if (!blinkFlag) {
+                this.#ctx.fillStyle = color;
+                this.#ctx.strokeStyle = 'black';
+                this.#ctx.strokeText(text, x, y);
+                this.#ctx.fillText(text, x, y);
+                blinkFlag = true;
+            }
+        }, 400);
+        const removeBlinkIntervalId = setInterval(() => {
+            blinkFlag = false;
+            this.#ctx.fillStyle = 'white';
+            this.#ctx.clearRect(x, y - fontsize, this.#ctx.measureText(text).width, fontsize + fontsize * 0.25);
+        }, 800);
+        return [drawBlinkIntervalId, removeBlinkIntervalId];
+    }
+
+    #beforeStart() {
+        this.#ctx.font = 'bold 100px VT323';
+        this.#canvas.style.background = `center / 99% 99% no-repeat  url(${background5}`;
+        this.#ctx.fillStyle = 'yellow';
+        this.#ctx.fillText('Y', 450, 400);
+        this.#ctx.fillStyle = 'lime';
+        this.#ctx.fillText('O', 500, 400);
+        this.#ctx.fillStyle = 'aqua';
+        this.#ctx.fillText('B', 550, 400);
+        this.#ctx.fillStyle = 'purple';
+        this.#ctx.fillText('I', 600, 400);
+        this.#ctx.fillStyle = 'red';
+        this.#ctx.fillText('T', 400, 500);
+        this.#ctx.fillStyle = 'blue';
+        this.#ctx.fillText('E', 450, 500);
+        this.#ctx.fillStyle = 'orange';
+        this.#ctx.fillText('T', 500, 500);
+        this.#ctx.fillStyle = 'lime';
+        this.#ctx.fillText('R', 550, 500);
+        this.#ctx.fillStyle = 'yellow';
+        this.#ctx.fillText('I', 600, 500);
+        this.#ctx.fillStyle = 'red';
+        this.#ctx.fillText('S', 650, 500);
+
+        const [drawBlinkIntervalId, removeBlinkIntervalId] = this.#drawBlinkEffectText('press enter to start', 40, 'white', 400, 800);
+        document.addEventListener(
+            'keydown',
+            (e) => {
+                if (e.key === 'Enter') {
+                    clearInterval(drawBlinkIntervalId);
+                    clearInterval(removeBlinkIntervalId);
+                    this.#gameStart();
+                }
+            },
+            { once: true }
+        );
     }
 
     #setBackgroundImage() {
@@ -109,6 +164,7 @@ export default class Tetris {
         this.#renderAnimationId = requestAnimationFrame(() => this.#canvasRender());
         this.#gravityIntervalId = setInterval(() => this.#gravity(), this.#gravityIntervalTime);
         this.#setEvent();
+        this.#setBackgroundImage();
         this.#canvas.dispatchEvent(new CustomEvent('startPlay', { bubbles: true }));
     }
 
@@ -118,8 +174,14 @@ export default class Tetris {
         clearInterval(this.#gravityIntervalId);
     }
 
+<<<<<<< HEAD
     #fillTextAsGradientColor(x, y, text, outlineColor, color) {
         this.#ctx.strokeStyle = outlineColor;
+=======
+    #fillTextAsGradientColor(x, y, text, color) {
+        this.#ctx.font = 'bold 80px VT323';
+        this.#ctx.strokeStyle = 'purple';
+>>>>>>> 6051d33 (feat: startModal 추가)
         this.#ctx.strokeText(text, x, y);
         const gradient = this.#ctx.createLinearGradient(x, y, this.#ctx.measureText(text).width, y + 64);
         gradient.addColorStop(0, 'white');
