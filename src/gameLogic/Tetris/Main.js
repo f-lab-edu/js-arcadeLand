@@ -21,6 +21,9 @@ export default class Tetris {
     #lines;
     #score;
     #board;
+    #centerX;
+    #centerY;
+    #backgroundImages;
 
     constructor($canvas) {
         this.#canvas = $canvas;
@@ -115,8 +118,8 @@ export default class Tetris {
         clearInterval(this.#gravityIntervalId);
     }
 
-    #fillTextAsGradientColor(x, y, text, color) {
-        this.#ctx.strokeStyle = 'purple';
+    #fillTextAsGradientColor(x, y, text, outlineColor, color) {
+        this.#ctx.strokeStyle = outlineColor;
         this.#ctx.strokeText(text, x, y);
         const gradient = this.#ctx.createLinearGradient(x, y, this.#ctx.measureText(text).width, y + 64);
         gradient.addColorStop(0, 'white');
@@ -125,7 +128,7 @@ export default class Tetris {
         this.#ctx.fillText(text, x, y);
     }
     #drawNext() {
-        this.#fillTextAsGradientColor(100, 200, 'NEXT', 'red');
+        this.#fillTextAsGradientColor(100, 200, 'NEXT', 'purple', 'red');
         this.#ctx.fillStyle = this.#nextTetromino.color;
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 4; x++) {
@@ -136,21 +139,26 @@ export default class Tetris {
         }
     }
     #drawInformation() {
-        this.#fillTextAsGradientColor(100, 400, 'LEVEL', 'lime');
-        this.#fillTextAsGradientColor(100, 500, `${this.#level}`, 'lime');
-        this.#fillTextAsGradientColor(100, 600, 'SCORE', 'aqua');
-        this.#fillTextAsGradientColor(100, 700, `${this.#score}`, 'aqua');
-        this.#fillTextAsGradientColor(100, 800, 'LINES', 'orange');
-        this.#fillTextAsGradientColor(100, 900, `${this.#lines}`, 'orange');
+        this.#fillTextAsGradientColor(100, 400, 'LEVEL', 'purple', 'lime');
+        this.#fillTextAsGradientColor(100, 500, `${this.#level}`, 'purple', 'lime');
+        this.#fillTextAsGradientColor(100, 600, 'SCORE', 'purple', 'aqua');
+        this.#fillTextAsGradientColor(100, 700, `${this.#score}`, 'purple', 'aqua');
+        this.#fillTextAsGradientColor(100, 800, 'LINES', 'purple', 'orange');
+        this.#fillTextAsGradientColor(100, 900, `${this.#lines}`, 'purple', 'orange');
     }
     #drawBaord() {
         this.#ctx.strokeStyle = 'white';
         for (let y = 0; y < this.#column; y++) {
             for (let x = 0; x < this.#row; x++) {
-                this.#ctx.strokeRect(this.centerX + x * this.#gridSize, this.centerY + y * this.#gridSize, this.#gridSize - 2, this.#gridSize - 2);
+                this.#ctx.strokeRect(this.#centerX + x * this.#gridSize, this.#centerY + y * this.#gridSize, this.#gridSize - 2, this.#gridSize - 2);
                 if (this.#board[y][x].value) {
                     this.#ctx.fillStyle = this.#board[y][x].color;
-                    this.#ctx.fillRect(this.centerX + x * this.#gridSize, this.centerY + y * this.#gridSize, this.#gridSize - 2, this.#gridSize - 2);
+                    this.#ctx.fillRect(
+                        this.#centerX + x * this.#gridSize,
+                        this.#centerY + y * this.#gridSize,
+                        this.#gridSize - 2,
+                        this.#gridSize - 2
+                    );
                 }
             }
         }
@@ -162,8 +170,8 @@ export default class Tetris {
                 if (this.#curTetromino.block[y][x]) {
                     this.#ctx.fillStyle = this.#curTetromino.color;
                     this.#ctx.fillRect(
-                        this.centerX + this.#gridSize * (this.#curTetromino.curX + x),
-                        this.centerY + this.#gridSize * (this.#curTetromino.curY + y),
+                        this.#centerX + this.#gridSize * (this.#curTetromino.curX + x),
+                        this.#centerY + this.#gridSize * (this.#curTetromino.curY + y),
                         this.#gridSize - 2,
                         this.#gridSize - 2
                     );
