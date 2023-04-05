@@ -178,14 +178,9 @@ export default class Tetris {
         this.#gameStartTrigger(drawBlinkIntervalId, removeBlinkIntervalId);
     }
 
-<<<<<<< HEAD
     #fillTextAsGradientColor(x, y, text, outlineColor, color) {
+        this.#ctx.font = `bold 80px VT323`;
         this.#ctx.strokeStyle = outlineColor;
-=======
-    #fillTextAsGradientColor(x, y, text, color) {
-        this.#ctx.font = 'bold 80px VT323';
-        this.#ctx.strokeStyle = 'purple';
->>>>>>> 6051d33 (feat: startModal 추가)
         this.#ctx.strokeText(text, x, y);
         const gradient = this.#ctx.createLinearGradient(x, y, this.#ctx.measureText(text).width, y + 64);
         gradient.addColorStop(0, 'white');
