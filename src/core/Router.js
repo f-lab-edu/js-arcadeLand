@@ -28,7 +28,7 @@ class Router {
 
     interfaceNavigate() {
         window.addEventListener('popstate', () => {
-            this.#curRoute.clearEvent();
+            this.#curRoute && this.#curRoute.clearEvent();
             this.render();
         });
     }
