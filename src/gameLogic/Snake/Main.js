@@ -1,3 +1,5 @@
+import Apple from './Apple';
+
 export default class Snake {
     #canvas;
     #ctx;
@@ -6,7 +8,7 @@ export default class Snake {
     #rowGridCount;
     #columnGridCount;
     #headSnakeLocation;
-    #appleLocation;
+    #apple;
     #snakeLocationList;
     #tail;
     #score;
@@ -26,7 +28,7 @@ export default class Snake {
         this.#columnGridCount = (this.#canvas.height - this.#padding * 2) / this.#gridSize;
         //default location
         this.#headSnakeLocation = { x: 1, y: 1 };
-        this.#appleLocation = { x: 4, y: 4 };
+        this.#apple = new Apple(this.#ctx, this.#padding, this.#gridSize, this.#rowGridCount, this.#columnGridCount);
         this.#snakeLocationList = [];
         //information
         this.#tail = 1;
@@ -35,10 +37,10 @@ export default class Snake {
         //snakeSize
         this.#snakeWidth = this.#gridSize - 2;
         this.#snakeHeight = this.#gridSize - 2;
-        this.#beforeStart();
+        this.#attachEventListnerForStart();
     }
 
-    #beforeStart() {
+    #attachEventListnerForStart() {
         document.addEventListener(
             'keydown',
             (e) => {
@@ -52,20 +54,20 @@ export default class Snake {
     }
 
     #animate() {
-        this.#renderReset();
-        this.#informationRender();
+        this.#prepareRender();
+        this.#scoreRender();
         this.#moveSnake();
         this.#resetOverFlowSnakeLocation();
         this.#snakeRender();
-        this.#appleRender();
+        this.#apple.draw();
     }
 
-    #renderReset() {
+    #prepareRender() {
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
         this.#ctx.strokeStyle = 'white';
         this.#ctx.strokeRect(this.#padding, this.#padding, this.#canvas.width - this.#padding * 2, this.#canvas.height - this.#padding * 2);
     }
-    #informationRender() {
+    #scoreRender() {
         this.#ctx.font = 'bold 50px serif';
         this.#ctx.fillStyle = 'white';
         this.#ctx.fillText(`SCORE: ${this.#score}`, 100, 90);
@@ -86,13 +88,13 @@ export default class Snake {
     #moveSnake() {
         this.#headSnakeLocation.x += this.#move.x;
         this.#headSnakeLocation.y += this.#move.y;
-        if (this.#appleLocation.x === this.#headSnakeLocation.x && this.#appleLocation.y === this.#headSnakeLocation.y) {
+        if (this.#apple.x === this.#headSnakeLocation.x && this.#apple.y === this.#headSnakeLocation.y) {
             this.#score += 10;
             this.#tail += 1;
-            this.#appleLocation.x = Math.floor(Math.random() * this.#rowGridCount);
-            this.#appleLocation.y = Math.floor(Math.random() * this.#columnGridCount);
+            this.#apple = new Apple(this.#ctx, this.#padding, this.#gridSize, this.#rowGridCount, this.#columnGridCount);
         }
     }
+
     #snakeRender() {
         this.#ctx.fillStyle = 'lime';
         this.#snakeLocationList.forEach((_, index) => {
@@ -115,16 +117,6 @@ export default class Snake {
         while (this.#snakeLocationList.length > this.#tail) {
             this.#snakeLocationList.shift();
         }
-    }
-
-    #appleRender() {
-        this.#ctx.fillStyle = 'red';
-        this.#ctx.fillRect(
-            this.#appleLocation.x * this.#gridSize + this.#padding,
-            this.#appleLocation.y * this.#gridSize + this.#padding,
-            this.#snakeWidth,
-            this.#snakeHeight
-        );
     }
 
     #gameEnd() {
