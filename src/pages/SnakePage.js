@@ -1,6 +1,6 @@
 import CoreComponent from '../core/CoreComponent';
 import RetroContainerComponent from '../components/RetroContainerComponent';
-import Snake from '../gameLogic/Snake/Main';
+import SnakeGame from '../gameLogic/Snake/Main';
 export default class SnakePage extends CoreComponent {
     setHTML() {
         return `
@@ -13,6 +13,6 @@ export default class SnakePage extends CoreComponent {
     }
     setup() {
         //1080px 기준
-        new Snake(document.getElementById('retroCanvas'));
+        new SnakeGame(document.getElementById('retroCanvas'));
     }
 }

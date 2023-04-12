@@ -1,20 +1,16 @@
 import Apple from './Apple';
+import Snake from './Snake';
 
-export default class Snake {
+export default class SnakeGame {
     #canvas;
     #ctx;
     #padding;
     #gridSize;
     #rowGridCount;
     #columnGridCount;
-    #headSnakeLocation;
     #apple;
-    #snakeLocationList;
-    #tail;
+    #snake;
     #score;
-    #move;
-    #snakeWidth;
-    #snakeHeight;
     #animationId;
 
     constructor(canvas) {
@@ -26,17 +22,7 @@ export default class Snake {
         this.#gridSize = 20;
         this.#rowGridCount = (this.#canvas.width - this.#padding * 2) / this.#gridSize;
         this.#columnGridCount = (this.#canvas.height - this.#padding * 2) / this.#gridSize;
-        //default location
-        this.#headSnakeLocation = { x: 1, y: 1 };
-        this.#apple = new Apple(this.#ctx, this.#padding, this.#gridSize, this.#rowGridCount, this.#columnGridCount);
-        this.#snakeLocationList = [];
-        //information
-        this.#tail = 1;
         this.#score = 0;
-        this.#move = { x: 0, y: 0 };
-        //snakeSize
-        this.#snakeWidth = this.#gridSize - 2;
-        this.#snakeHeight = this.#gridSize - 2;
         this.#attachEventListnerForStart();
     }
 
@@ -46,7 +32,8 @@ export default class Snake {
             (e) => {
                 if (e.key === 'Enter') {
                     this.#animationId = setInterval(() => this.#animate(), 60);
-                    this.#setEvent();
+                    this.#snake = new Snake(this.#ctx, this.#padding, this.#gridSize, this.#rowGridCount, this.#columnGridCount);
+                    this.#apple = new Apple(this.#ctx, this.#padding, this.#gridSize, this.#rowGridCount, this.#columnGridCount);
                 }
             },
             { once: true }
@@ -56,10 +43,13 @@ export default class Snake {
     #animate() {
         this.#prepareRender();
         this.#scoreRender();
-        this.#moveSnake();
-        this.#resetOverFlowSnakeLocation();
-        this.#snakeRender();
+        this.#snake.draw();
         this.#apple.draw();
+        this.#snake.updateSnakeState();
+        if (this.#snake.collisionCheck()) {
+            this.#gameEnd();
+        }
+        this.#scoreCheck();
     }
 
     #prepareRender() {
@@ -73,49 +63,11 @@ export default class Snake {
         this.#ctx.fillText(`SCORE: ${this.#score}`, 100, 90);
     }
 
-    #resetOverFlowSnakeLocation() {
-        if (this.#headSnakeLocation.x < 0) {
-            this.#headSnakeLocation.x = this.#rowGridCount - 1;
-        } else if (this.#headSnakeLocation.x > this.#rowGridCount) {
-            this.#headSnakeLocation.x = 0;
-        } else if (this.#headSnakeLocation.y < 0) {
-            this.#headSnakeLocation.y = this.#columnGridCount - 1;
-        } else if (this.#headSnakeLocation.y > this.#columnGridCount - 1) {
-            this.#headSnakeLocation.y = 0;
-        }
-    }
-
-    #moveSnake() {
-        this.#headSnakeLocation.x += this.#move.x;
-        this.#headSnakeLocation.y += this.#move.y;
-        if (this.#apple.x === this.#headSnakeLocation.x && this.#apple.y === this.#headSnakeLocation.y) {
+    #scoreCheck() {
+        if (this.#apple.x === this.#snake.x && this.#apple.y === this.#snake.y) {
             this.#score += 10;
-            this.#tail += 1;
+            this.#snake.tail += 1;
             this.#apple = new Apple(this.#ctx, this.#padding, this.#gridSize, this.#rowGridCount, this.#columnGridCount);
-        }
-    }
-
-    #snakeRender() {
-        this.#ctx.fillStyle = 'lime';
-        this.#snakeLocationList.forEach((_, index) => {
-            this.#ctx.fillRect(
-                this.#snakeLocationList[index].x * this.#gridSize + this.#padding,
-                this.#snakeLocationList[index].y * this.#gridSize + this.#padding,
-                this.#snakeWidth,
-                this.#snakeHeight
-            );
-            if (
-                this.#snakeLocationList.length != 1 &&
-                this.#snakeLocationList[index].x === this.#headSnakeLocation.x &&
-                this.#snakeLocationList[index].y === this.#headSnakeLocation.y
-            ) {
-                this.#gameEnd();
-            }
-        });
-
-        this.#snakeLocationList.push(Object.assign({}, this.#headSnakeLocation));
-        while (this.#snakeLocationList.length > this.#tail) {
-            this.#snakeLocationList.shift();
         }
     }
 
@@ -128,24 +80,5 @@ export default class Snake {
         this.#ctx.fillStyle = 'white';
         this.#ctx.font = 'bold 50px serif';
         this.#ctx.fillText(`SCORE: ${this.#score}`, (this.#canvas.width - this.#ctx.measureText(`SCORE: ${this.#score}`).width) / 2, 600);
-    }
-
-    #setEvent() {
-        document.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'ArrowLeft':
-                    this.#move = { x: -1, y: 0 };
-                    break;
-                case 'ArrowUp':
-                    this.#move = { x: 0, y: -1 };
-                    break;
-                case 'ArrowRight':
-                    this.#move = { x: 1, y: 0 };
-                    break;
-                case 'ArrowDown':
-                    this.#move = { x: 0, y: 1 };
-                    break;
-            }
-        });
     }
 }
