@@ -31,7 +31,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(svg|jpeg|gif|jpg|png|fbx|glb,mp3)$/i,
+                test: /\.(svg|jpeg|gif|jpg|png|fbx|glb|mp3)$/i,
                 type: 'asset/resource',
             },
             { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
@@ -60,7 +60,14 @@ module.exports = {
             chunkFilename: '[name].[contenthash].chunk.css',
         }),
         new CopyPlugin({
-            patterns: [{ from: './resource/arcade_machine/textures/ARCADE_baseColor.webp', to: '[name].webp' }],
+            patterns: [
+                {
+                    from: './resource/arcade_machine/textures/ARCADE_baseColor.webp',
+                    to: '[name].webp',
+                    from: './resource/avatar/textures/red_Base_Color.png',
+                    to: '[name].png',
+                },
+            ],
         }),
 
         new BundleAnalyzerPlugin(),

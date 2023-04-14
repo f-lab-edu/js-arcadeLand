@@ -5,10 +5,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import sceneBackground from '../../resource/space.jpg';
 import floorTexture from '../../resource/floorTexture.jpg';
-import avatar from '../../resource/avatar/Ch09_nonPBR.fbx';
-import walkAnimation from '../../resource/avatar/Walking.fbx';
-import idleAnimation from '../../resource/avatar/Idle.fbx';
 import arcadeMachine from '../../resource/arcade_machine/arcadeMachine.glb';
+import character from '../../resource/avatar/character.fbx';
 export default class World {
     constructor(parent) {
         this.parent = parent;
@@ -133,25 +131,19 @@ export default class World {
         this.move = { forward: false, backward: false, left: false, right: false };
         this.clock = new THREE.Clock();
         const fbxLoader = new FBXLoader(this.loadManager);
-        fbxLoader.load(avatar, (target) => {
+        fbxLoader.load(character, (target) => {
             this.character = target;
-            this.character.scale.setScalar(0.05);
+            this.character.scale.setScalar(0.1);
             this.character.traverse((e) => {
                 if (e.isMesh) e.castShadow = true;
             });
             this.character.position.set(10, 0, -30);
             this.scene.add(this.character);
             this.mixer = new THREE.AnimationMixer(this.character);
-            const animationLoad = (name, ani) => {
-                const clip = ani.animations[0];
-                const action = this.mixer.clipAction(clip);
-                this.animations[name] = { clip, action };
-            };
-            fbxLoader.load(walkAnimation, (ani) => animationLoad('walk', ani));
-            fbxLoader.load(idleAnimation, (ani) => {
-                animationLoad('idle', ani);
-                this.animations.idle.action.play();
-            });
+
+            this.animations['walk'] = { action: this.mixer.clipAction(this.character.animations[1]), state: false };
+            this.animations['idle'] = { action: this.mixer.clipAction(this.character.animations[4]), state: false };
+            this.animations.idle.action.play();
         });
     }
     #thirdPersonCamera() {
@@ -192,7 +184,7 @@ export default class World {
         }
         this.character.translateZ(this.speed);
         this.renderer.render(this.scene, this.camera);
-        requestAnimationFrame(() => this.#animate());
+        this.animationId = requestAnimationFrame(() => this.#animate());
     }
 
     #setEvent() {
@@ -211,6 +203,7 @@ export default class World {
             for (let i = 0; i < intersects.length; i++) {
                 if (routeList.includes(intersects[i].object.name)) {
                     router.push(intersects[i].object.name);
+                    cancelAnimationFrame(this.animationId);
                     this.clearEvent();
                     return;
                 }
@@ -226,11 +219,20 @@ export default class World {
                 case 'ArrowUp':
                     this.move.forward = boolean;
                     if (boolean) {
-                        this.animations.walk.action.play();
+                        if (this.animations.walk.state === false) {
+                            this.animations.idle.action.stop();
+                            this.animations.idle.state = false;
+                            this.animations.walk.action.play();
+                            this.animations.walk.state = true;
+                        }
                         break;
                     }
-                    this.mixer.stopAllAction();
-                    this.animations.idle.action.play();
+                    if (this.animations.idle.state === false) {
+                        this.animations.walk.action.stop();
+                        this.animations.walk.state = false;
+                        this.animations.idle.action.play();
+                        this.animations.idle.state = true;
+                    }
                     break;
                 case 'ArrowRight':
                     this.move.right = boolean;
@@ -238,11 +240,20 @@ export default class World {
                 case 'ArrowDown':
                     this.move.backward = boolean;
                     if (boolean) {
-                        this.animations.walk.action.play();
+                        if (this.animations.walk.state === false) {
+                            this.animations.idle.action.stop();
+                            this.animations.idle.state = false;
+                            this.animations.walk.action.play();
+                            this.animations.walk.state = true;
+                        }
                         break;
                     }
-                    this.mixer.stopAllAction();
-                    this.animations.idle.action.play();
+                    if (this.animations.idle.state === false) {
+                        this.animations.walk.action.stop();
+                        this.animations.walk.state = false;
+                        this.animations.idle.action.play();
+                        this.animations.idle.state = true;
+                    }
                     break;
             }
         };
