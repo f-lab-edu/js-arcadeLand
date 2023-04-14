@@ -113,7 +113,7 @@ export default class World {
                                 e.name = 'Ball';
                                 break;
                             case 3:
-                                e.name = 'Galaga';
+                                e.name = 'Bird';
                                 break;
                         }
                     }
@@ -199,7 +199,7 @@ export default class World {
             this.mouseLocation.y = -(e.clientY / window.innerHeight) * 2 + 1;
             this.rayCaster.setFromCamera(this.mouseLocation, this.camera);
             const intersects = this.rayCaster.intersectObjects(this.scene.children);
-            const routeList = ['Snake', 'Tetris', 'Ball', 'Galaga'];
+            const routeList = ['Snake', 'Tetris', 'Ball', 'Bird'];
             for (let i = 0; i < intersects.length; i++) {
                 if (routeList.includes(intersects[i].object.name)) {
                     router.push(intersects[i].object.name);
