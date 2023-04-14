@@ -14,6 +14,7 @@ export default class World {
         this.parent = parent;
         this.#Init();
     }
+
     #Init() {
         this.#setRenderer();
         this.#loadManage();

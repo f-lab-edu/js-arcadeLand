@@ -1,11 +1,13 @@
 export default class CoreComponent {
+    #events;
     constructor($target, props) {
         this.$target = $target;
         this.props = props;
+        this.#events = [];
         this.render();
         this.appendChild();
-        this.setup();
         this.setEvent();
+        this.setup();
     }
 
     setup() {}
@@ -25,10 +27,14 @@ export default class CoreComponent {
 
     setEvent() {}
 
-    addEvent(type, selector, callback) {
-        this.$target.addEventListener(type, (event) => {
-            if (!event.target.closest(selector)) return false;
-            callback(event);
+    addEvent(type, callback) {
+        this.#events.push({ type, callback });
+        this.$target.addEventListener(type, callback);
+    }
+
+    clearEvent() {
+        this.#events.forEach(({ type, callback }) => {
+            this.$target.removeEventListener(type, callback);
         });
     }
 }
