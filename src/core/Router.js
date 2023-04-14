@@ -11,7 +11,7 @@ class Router {
     }
 
     render() {
-        const curPath = window.location.pathname.slice(1);
+        const curPath = window.location.pathname;
         const routeTarget = this.paths.find((route) => route.path === curPath);
         if (routeTarget) {
             this.#curRoute = new routeTarget.component(this.$target);
